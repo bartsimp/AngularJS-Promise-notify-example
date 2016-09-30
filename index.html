@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" />
+<style>
+body {
+	padding: 50px;
+}
+
+form {
+	margin-top: 0 !important;
+	padding: 0 !important;
+}
+
+form input {
+	width: 100% !important;
+}
+
+.alert {
+	padding: 5px 15px 5px 15px;
+}
+
+.progress {
+	height: 30px;
+	padding: 0;
+}
+
+.progress span {
+	font-size: 2em;
+	line-height: 30px;
+}
+</style>
+</head>
+<body ng-app="app" ng-controller="MainCtrl">
+
+	<h3>Example 1 : Simple promise</h3>
+	<div class="row" ng-controller="ExampleOneCtrl">
+		<div class="col-xs-2">
+			<form class="navbar-form navbar-left" ng-submit="generatePromise(delay)" class="form-inline" role="form">
+				<div class="form-group">
+					<label class="sr-only" for="delay">Delay:</label> <input ng-model="delay" id="delay" type="number" class="form-control" placeholder="Delay of the promise" required="required">
+				</div>
+				<button ng-disabled="!(!promise || promise.progress == 100)" type="submit" class="btn btn-default">Submit</button>
+			</form>
+		</div>
+		<div class="col-xs-10 progress">
+			<div ng-class="getProgressClass(promise.progress, promise.result)" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{promise.progress}}" aria-valuemin="0"
+				aria-valuemax="100" style="width: {{promise.progress}}%">
+				<span>{{promise.progress}} %</span>
+			</div>
+		</div>
+		<div ng-if="promise.result != null && promise.progress == 100" class="col-xs-12 alert alert-success" role="alert">{{promise.result}}</div>
+		<div ng-if="promise.result != null && !(promise.progress == 100)" class="col-xs-12 alert alert-info" role="alert">{{promise.result}}</div>
+	</div>
+	<hr />
+
+	<h3>Example 2 : Chained promises</h3>
+	<div ng-controller="ExampleTwoCtrl">
+		<form ng-submit="generateChainedPromises(promises)" role="form">
+			<button ng-disabled="promises.length == 0 || promise.progress < 100" type="submit" class="btn btn-default">Submit</button>
+			<button ng-disabled="promise.progress == 100" ng-click="add()" class="btn btn-default">Add</button>
+			<button ng-disabled="promise && promise.progress != 100" ng-click="reset()" class="btn btn-default" type="reset">Reset</button>
+			<br /> <br />
+			<div class="row" ng-repeat="promise in promises" ng-controller="ExampleTwoCtrl">
+				<div class="col-xs-2 form-group">
+					<label class="sr-only" for="delay">Delay:</label>
+					<input ng-model="promise.delay" id="delay" type="number" class="form-control" placeholder="Delay of the promise" required="required">
+				</div>
+				<div class="col-xs-10 progress">
+					<div ng-class="getProgressClass(promise.progress, promise.result)" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{promise.progress}}" aria-valuemin="0"
+						aria-valuemax="100" style="width: {{promise.progress}}%">
+						<span>{{promise.progress}} %</span>
+					</div>
+				</div>
+				<div ng-if="promise.result != null && promise.progress == 100" class="col-xs-12 alert alert-success" role="alert">{{promise.result}}</div>
+				<div ng-if="promise.result != null && !(promise.progress == 100)" class="col-xs-12 alert alert-info" role="alert">{{promise.result}}</div>
+			</div>
+		</form>
+		<div class="progress">
+			<div ng-class="getProgressClass(promise.progress, promise.result)" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{promise.progress}}" aria-valuemin="0"
+				aria-valuemax="100" style="width: {{promise.progress}}%">
+				<span>{{promise.progress}} %</span>
+			</div>
+		</div>
+		<div ng-if="promise.result != null && promise.progress == 100" class="alert alert-success" role="alert">{{promise.result}}</div>
+		<div ng-if="promise.result != null && !(promise.progress == 100)" class="alert alert-info" role="alert">{{promise.result}}</div>
+	</div>
+	<hr />
+
+	<h3>Example 3 : Recursive promise (N times)</h3>
+	<div class="row" ng-controller="ExampleThreeCtrl">
+		<div class="col-xs-2">
+			<form class="navbar-form navbar-left" ng-submit="generateRecursivePromise(number)" class="form-inline" role="form">
+				<div class="form-group">
+					<label class="sr-only" for="number">Number:</label> <input ng-model="number" id="number" type="number" class="form-control" placeholder="Number of recursive calls" required="required">
+				</div>
+				<button ng-disabled="!(!promise || promise.progress == 100)" type="submit" class="btn btn-default">Submit</button>
+			</form>
+		</div>
+		<div class="col-xs-10 progress">
+			<div ng-class="getProgressClass(promise.progress, promise.result)" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{promise.progress}}" aria-valuemin="0"
+				aria-valuemax="100" style="width: {{promise.progress}}%">
+				<span>{{promise.progress}} %</span>
+			</div>
+		</div>
+		<div ng-if="promise.result != null && promise.progress == 100" class="col-xs-12 alert alert-success" role="alert">{{promise.result}}</div>
+		<div ng-if="promise.result != null && !(promise.progress == 100)" class="col-xs-12 alert alert-info" role="alert">{{promise.result}}</div>
+	</div>
+	<hr />
+
+	<h3>Example 4 : Combined promises</h3>
+	<div ng-controller="ExampleFourCtrl">
+		<form ng-submit="generateCombinedPromises(promises)" role="form">
+			<button ng-disabled="promises.length == 0 || promise.progress < 100" type="submit" class="btn btn-default">Submit</button>
+			<button ng-disabled="promise" ng-click="add()" class="btn btn-default">Add</button>
+			<button ng-disabled="promise && promise.progress != 100" ng-click="reset()" class="btn btn-default" type="reset">Reset</button>
+			<br /> <br />
+			<div class="row" ng-repeat="promise in promises" ng-controller="ExampleTwoCtrl">
+				<div class="col-xs-2 form-group">
+					<label class="sr-only" for="delay">Delay:</label> <input ng-model="promise.delay" id="delay" type="number" class="form-control" placeholder="Delay of the promise" required="required">
+				</div>
+				<div class="col-xs-10 progress">
+					<div ng-class="getProgressClass(promise.progress, promise.result)" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{promise.progress}}" aria-valuemin="0"
+						aria-valuemax="100" style="width: {{promise.progress}}%">
+						<span>{{promise.progress}} %</span>
+					</div>
+				</div>
+				<div ng-if="promise.result != null && promise.progress == 100" class="col-xs-12 alert alert-success" role="alert">{{promise.result}}</div>
+				<div ng-if="promise.result != null && !(promise.progress == 100)" class="col-xs-12 alert alert-info" role="alert">{{promise.result}}</div>
+			</div>
+		</form>
+		<div class="progress">
+			<div ng-class="getProgressClass(promise.progress, promise.result)" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{promise.progress}}" aria-valuemin="0"
+				aria-valuemax="100" style="width: {{promise.progress}}%">
+				<span>{{promise.progress}} %</span>
+			</div>
+		</div>
+		<div ng-if="promise.result != null && promise.progress == 100" class="alert alert-success" role="alert">{{promise.result}}</div>
+		<div ng-if="promise.result != null && !(promise.progress == 100)" class="alert alert-info" role="alert">{{promise.result}}</div>
+	</div>
+	<hr />
+
+	<h3>Example 5 : Combined recursive promises (N times)</h3>
+	<div ng-controller="ExampleFiveCtrl">
+		<form ng-submit="generateCombinedPromises(promises)" role="form">
+			<button ng-disabled="promises.length == 0 || promise.progress < 100" type="submit" class="btn btn-default">Submit</button>
+			<button ng-disabled="promise" ng-click="add()" class="btn btn-default">Add</button>
+			<button ng-disabled="promise && promise.progress != 100" ng-click="reset()" class="btn btn-default" type="reset">Reset</button>
+			<br /> <br />
+			<div class="row" ng-repeat="promise in promises" ng-controller="ExampleTwoCtrl">
+				<div class="col-xs-2 form-group">
+					<label class="sr-only" for="number">Number:</label> <input ng-model="promise.number" id="number" type="number" class="form-control" placeholder="Number of recursive calls" required="required">
+				</div>
+				<div class="col-xs-10 progress">
+					<div ng-class="getProgressClass(promise.progress, promise.result)" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{promise.progress}}" aria-valuemin="0"
+						aria-valuemax="100" style="width: {{promise.progress}}%">
+						<span>{{promise.progress}} %</span>
+					</div>
+				</div>
+				<div ng-if="promise.result != null && promise.progress == 100" class="col-xs-12 alert alert-success" role="alert">{{promise.result}}</div>
+				<div ng-if="promise.result != null && !(promise.progress == 100)" class="col-xs-12 alert alert-info" role="alert">{{promise.result}}</div>
+			</div>
+		</form>
+		<div class="progress">
+			<div ng-class="getProgressClass(promise.progress, promise.result)" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{promise.progress}}" aria-valuemin="0"
+				aria-valuemax="100" style="width: {{promise.progress}}%">
+				<span>{{promise.progress}} %</span>
+			</div>
+		</div>
+		<div ng-if="promise.result != null && promise.progress == 100" class="alert alert-success" role="alert">{{promise.result}}</div>
+		<div ng-if="promise.result != null && !(promise.progress == 100)" class="alert alert-info" role="alert">{{promise.result}}</div>
+	</div>
+
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+	
+	<script src="app.js"></script>
+	<script src="PromiseService.js"></script>
+	<script src="MainCtrl.js"></script>
+	<script src="ExampleOneCtrl.js"></script>
+	<script src="ExampleTwoCtrl.js"></script>
+	<script src="ExampleThreeCtrl.js"></script>
+	<script src="ExampleFourCtrl.js"></script>
+	<script src="ExampleFiveCtrl.js"></script>
+</body>
+</html>
